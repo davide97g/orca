@@ -1,3 +1,6 @@
+> [!NOTE]
+> **Fork of [stablyai/orca](https://github.com/stablyai/orca)** with a VS Code-style branch switcher in the Source Control panel. Update and build steps: [FORK.md](FORK.md).
+
 <h1 align="center">
   <a href="https://onOrca.dev"><img src="resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
 </h1>
