@@ -196,6 +196,40 @@ describe('GitHandler', () => {
       expect(after.current).toBe('feature')
       expect(after.branches[0]).toBe('feature')
     })
+
+    it('creates a branch from HEAD and a tracking branch from a start point', async () => {
+      gitInit(tmpDir)
+      writeFileSync(path.join(tmpDir, 'file.txt'), 'base\n')
+      gitCommit(tmpDir, 'initial')
+      const showCurrent = (): string =>
+        execFileSync('git', ['branch', '--show-current'], {
+          cwd: tmpDir,
+          encoding: 'utf-8',
+          stdio: 'pipe'
+        }).trim()
+      const baseBranch = showCurrent()
+
+      await dispatcher.callRequest('git.checkout', {
+        worktreePath: tmpDir,
+        branch: 'fresh',
+        create: {}
+      })
+      expect(showCurrent()).toBe('fresh')
+
+      await dispatcher.callRequest('git.checkout', {
+        worktreePath: tmpDir,
+        branch: 'tracked',
+        create: { startPoint: baseBranch, track: true }
+      })
+      expect(showCurrent()).toBe('tracked')
+      expect(
+        execFileSync('git', ['config', '--get', 'branch.tracked.merge'], {
+          cwd: tmpDir,
+          encoding: 'utf-8',
+          stdio: 'pipe'
+        }).trim()
+      ).toBe(`refs/heads/${baseBranch}`)
+    })
   })
 
   describe('markRemoteOrcaCreated', () => {

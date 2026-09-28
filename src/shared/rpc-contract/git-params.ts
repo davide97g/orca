@@ -254,7 +254,17 @@ export const GitCheckout = WorktreeSelector.extend({
         .min(1, 'Missing branch')
         // Why: never let a branch arg be parsed as a git flag (arg injection).
         .refine((value) => !value.startsWith('-'), 'Branch must not start with -')
-    )
+    ),
+  create: z
+    .object({
+      startPoint: z
+        .string()
+        .min(1)
+        .refine((value) => !value.startsWith('-'), 'Start point must not start with -')
+        .optional(),
+      track: z.boolean().optional()
+    })
+    .optional()
 })
 
 export const GitRemoteFileUrl = WorktreeSelector.extend({

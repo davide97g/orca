@@ -10,6 +10,10 @@ import type { WorktreeGitIdentityDisplay } from '@/lib/worktree-git-identity-dis
 import { SourceControlHeaderIconButton } from './header-icon-button'
 import { SourceControlBranchLineTotalChip } from './branch-line-total-chip'
 import {
+  SourceControlBranchSwitcher,
+  type SourceControlBranchSwitchTarget
+} from './branch-switcher'
+import {
   buildSourceControlCompareBaseStats,
   formatSourceControlRefLabel,
   resolveSourceControlDisplayedBaseRef,
@@ -101,7 +105,13 @@ function resolveHeadFlowLabel(
   return null
 }
 
-function HeadIdentity({ display }: { display: WorktreeGitIdentityDisplay }): React.JSX.Element {
+function HeadIdentity({
+  display,
+  branchSwitch
+}: {
+  display: WorktreeGitIdentityDisplay
+  branchSwitch?: SourceControlBranchSwitchTarget | null
+}): React.JSX.Element {
   if (display.kind === 'detached') {
     return (
       <DetachedHeadBadge
@@ -112,6 +122,10 @@ function HeadIdentity({ display }: { display: WorktreeGitIdentityDisplay }): Rea
         className="min-w-0 max-w-full shrink"
       />
     )
+  }
+
+  if (branchSwitch) {
+    return <SourceControlBranchSwitcher branchName={display.branchName} target={branchSwitch} />
   }
 
   const branchAriaLabel = translate(
@@ -218,7 +232,8 @@ function StackedCompareFlow({
   changeBaseTitle,
   leading,
   trailing,
-  headTrailing
+  headTrailing,
+  branchSwitch
 }: {
   headDisplay: WorktreeGitIdentityDisplay | null
   baseRef: string
@@ -228,6 +243,7 @@ function StackedCompareFlow({
   leading?: React.ReactNode
   trailing?: React.ReactNode
   headTrailing?: React.ReactNode
+  branchSwitch?: SourceControlBranchSwitchTarget | null
 }): React.JSX.Element {
   if (!headDisplay) {
     return (
@@ -258,7 +274,7 @@ function StackedCompareFlow({
           counts reads as part of the branch name. */}
       <div className="flex min-w-0 items-center gap-2">
         <span className="flex min-w-0 flex-1 items-center">
-          <HeadIdentity display={headDisplay} />
+          <HeadIdentity display={headDisplay} branchSwitch={branchSwitch} />
         </span>
         {headTrailing}
       </div>
@@ -282,6 +298,7 @@ export function SourceControlBranchContextRow({
   headDisplay = null,
   manualReviewUrl,
   branchLineTotal,
+  branchSwitch,
   onChangeBaseRef,
   onRetry
 }: {
@@ -290,6 +307,7 @@ export function SourceControlBranchContextRow({
   headDisplay?: WorktreeGitIdentityDisplay | null
   manualReviewUrl?: string | null
   branchLineTotal?: GitBranchLineTotal | null
+  branchSwitch?: SourceControlBranchSwitchTarget | null
   onChangeBaseRef: () => void
   onRetry: () => void
 }): React.JSX.Element | null {
@@ -303,7 +321,7 @@ export function SourceControlBranchContextRow({
     }
     return (
       <div className="min-w-0 text-[11px] text-muted-foreground">
-        <HeadIdentity display={headDisplay} />
+        <HeadIdentity display={headDisplay} branchSwitch={branchSwitch} />
       </div>
     )
   }
@@ -332,6 +350,7 @@ export function SourceControlBranchContextRow({
       >
         <StackedCompareFlow
           headDisplay={headDisplay}
+          branchSwitch={branchSwitch}
           baseRef={displayedBaseRef}
           baseLabel={baseLabel}
           onChangeBaseRef={onChangeBaseRef}
@@ -354,6 +373,7 @@ export function SourceControlBranchContextRow({
       >
         <StackedCompareFlow
           headDisplay={headDisplay}
+          branchSwitch={branchSwitch}
           baseRef={displayedBaseRef}
           baseLabel={baseLabel}
           onChangeBaseRef={onChangeBaseRef}
@@ -392,6 +412,7 @@ export function SourceControlBranchContextRow({
     <CompareFlowGroup flowLabel={flowLabel} className="min-w-0 text-[11px] text-muted-foreground">
       <StackedCompareFlow
         headDisplay={headDisplay}
+        branchSwitch={branchSwitch}
         baseRef={displayedBaseRef}
         baseLabel={baseLabel}
         onChangeBaseRef={onChangeBaseRef}

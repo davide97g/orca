@@ -97,7 +97,9 @@ export const GIT_METHODS = [
     name: 'git.checkout',
     params: GitCheckout,
     handler: async (params, { runtime }) =>
-      runtime.checkoutRuntimeGitBranch(params.worktree, params.branch)
+      params.create === undefined
+        ? runtime.checkoutRuntimeGitBranch(params.worktree, params.branch)
+        : runtime.checkoutRuntimeGitBranch(params.worktree, params.branch, params.create)
   }),
   defineMethod({
     name: 'git.localBranches',

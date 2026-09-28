@@ -4,6 +4,7 @@ import { SourceControlNotesShelf } from '../notes/notes-shelf'
 import { SourceControlPanelContent } from './panel-content'
 import { SourceControlPanelDialogs } from './panel-dialogs'
 import type { SourceControlPanelReadyProps } from './panel-props'
+import { useSourceControlBranchSwitchTarget } from './use-branch-switch-target'
 
 /** The panel chrome: toolbar, notes shelf, the scrolling file surface, bulk bar and dialog layer. */
 export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
@@ -54,6 +55,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
     suppressedGitHubPRState,
     visibleCreatePrHeaderAction
   } = model
+  const branchSwitch = useSourceControlBranchSwitchTarget(model, worktreePath)
 
   return (
     <>
@@ -90,6 +92,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
           compareBaseRef={compareBaseRef}
           headDisplay={gitIdentityDisplay}
           manualReviewUrl={manualReviewUrl}
+          branchSwitch={branchSwitch}
         />
 
         {/* Why: hidden when count is 0 — notes are created from the diff view, so an empty Notes shelf here is pure chrome. */}

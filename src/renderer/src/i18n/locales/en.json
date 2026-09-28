@@ -18208,6 +18208,20 @@
   "sourceControl": {
     "unlinkedPr": {
       "status": "PR #{{number}} unlinked"
+    },
+    "branchSwitcher": {
+      "placeholder": "Select a branch or type a new name",
+      "create": "Create branch \"{{name}}\" from {{base}}",
+      "localHeading": "Branches",
+      "loading": "Loading branches…",
+      "checkedOutIn": "in {{name}}",
+      "remoteHeading": "Remote branches",
+      "noMatches": "No matching branches.",
+      "createFailed": "Could not create branch {{name}}",
+      "switchFailed": "Could not switch to {{name}}",
+      "tooltip": "Switch branch ({{name}})",
+      "disabledConflict": "Finish or abort the {{operation}} before switching branches",
+      "disabledRemote": "Wait for the running git operation to finish"
     }
   },
   "agentsSidebarIntro": {

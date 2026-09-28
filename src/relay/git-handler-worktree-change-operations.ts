@@ -1,3 +1,7 @@
+import {
+  buildGitBranchCheckoutArgv,
+  parseGitBranchCheckoutCreate
+} from '../shared/git-branch-checkout'
 import { GitHandlerOperationContext, GIT_BULK_CHUNK_SIZE } from './git-handler-operation-context'
 import { commitChangesRelay } from './git-handler-worktree-ops'
 
@@ -99,8 +103,12 @@ export class GitHandlerWorktreeChangeOperations extends GitHandlerOperationConte
     if (typeof branch !== 'string' || branch.length === 0 || branch.startsWith('-')) {
       throw new Error('invalid_branch_name')
     }
+    const create = parseGitBranchCheckoutCreate(params.create)
     try {
-      await this.git(['checkout', branch, '--'], worktreePath)
+      await this.git(
+        buildGitBranchCheckoutArgv({ branch, ...(create ? { create } : {}) }),
+        worktreePath
+      )
       return { ok: true as const, branch }
     } finally {
       this.clearGitMutationReadCaches()

@@ -772,6 +772,47 @@ describe('git RPC methods', () => {
     expect(response).toMatchObject({ ok: true, result: { ok: true, branch: 'feature/x' } })
   })
 
+  it('creates a tracking branch when create is requested', async () => {
+    const runtime = {
+      getRuntimeId: () => 'test-runtime',
+      checkoutRuntimeGitBranch: vi.fn().mockResolvedValue({ ok: true, branch: 'feature/x' })
+    } as unknown as OrcaRuntimeService
+    const dispatcher = new RpcDispatcher({ runtime, methods: GIT_METHODS })
+
+    const response = await dispatcher.dispatch(
+      makeRequest('git.checkout', {
+        worktree: 'id:wt-1',
+        branch: 'feature/x',
+        create: { startPoint: 'origin/feature/x', track: true }
+      })
+    )
+
+    expect(runtime.checkoutRuntimeGitBranch).toHaveBeenCalledWith('id:wt-1', 'feature/x', {
+      startPoint: 'origin/feature/x',
+      track: true
+    })
+    expect(response).toMatchObject({ ok: true })
+  })
+
+  it('rejects a checkout start point that starts with a dash', async () => {
+    const runtime = {
+      getRuntimeId: () => 'test-runtime',
+      checkoutRuntimeGitBranch: vi.fn()
+    } as unknown as OrcaRuntimeService
+    const dispatcher = new RpcDispatcher({ runtime, methods: GIT_METHODS })
+
+    const response = await dispatcher.dispatch(
+      makeRequest('git.checkout', {
+        worktree: 'id:wt-1',
+        branch: 'feature/x',
+        create: { startPoint: '--orphan' }
+      })
+    )
+
+    expect(response.ok).toBe(false)
+    expect(runtime.checkoutRuntimeGitBranch).not.toHaveBeenCalled()
+  })
+
   it('rejects a checkout branch that starts with a dash', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',

@@ -2,6 +2,7 @@ import type {
   GitBranchCompareResult,
   GitCommitCompareResult
 } from '../../shared/git-diff-compare-types'
+import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
 import type { GitConflictOperation } from '../../shared/git-status-types'
 import type { GitAdmissionTier } from '../git/command-runner/git-exec-options'
@@ -92,9 +93,19 @@ export class SshGitWorkingTreeProvider extends SshGitNoninteractiveProvider {
     })
   }
 
-  async checkoutBranch(worktreePath: string, branch: string): Promise<void> {
+  async checkoutBranch(
+    worktreePath: string,
+    branch: string,
+    create?: GitBranchCheckoutCreate
+  ): Promise<void> {
     await this.runWithGitReadInvalidation(async () => {
-      await this.mux.request('git.checkout', { worktreePath, branch })
+      // Why: an older relay ignores `create` and falls back to plain checkout, which fails
+      // safely for a branch that does not exist yet.
+      await this.mux.request('git.checkout', {
+        worktreePath,
+        branch,
+        ...(create ? { create } : {})
+      })
     })
   }
 
