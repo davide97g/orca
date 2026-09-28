@@ -6,6 +6,7 @@ import type {
 } from '../../shared/git-status-types'
 import type { RuntimeGitCheckoutResult, RuntimeGitLocalBranches } from '../../shared/runtime-types'
 import { checkIgnoredPaths } from '../git/check-ignored-paths'
+import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
 import { checkoutBranch, listLocalBranches } from '../git/checkout'
 import { getHistory as getGitHistory } from '../git/history'
 import {
@@ -106,18 +107,21 @@ export class RuntimeGitStatusCommands {
 
   async checkoutRuntimeGitBranch(
     worktreeSelector: string,
-    branch: string
+    branch: string,
+    create?: GitBranchCheckoutCreate
   ): Promise<RuntimeGitCheckoutResult> {
     const target = await this.host.resolveRuntimeGitTarget(worktreeSelector)
     const provider = requireRuntimeGitProvider(target)
     if (provider) {
-      await provider.checkoutBranch(target.worktree.path, branch)
+      await provider.checkoutBranch(target.worktree.path, branch, create)
       return { ok: true, branch }
     }
-    await checkoutBranch(target.worktree.path, branch, {
-      ...localGitOptionsForTarget(target),
-      admissionTier: 'interactive'
-    })
+    await checkoutBranch(
+      target.worktree.path,
+      branch,
+      { ...localGitOptionsForTarget(target), admissionTier: 'interactive' },
+      create
+    )
     return { ok: true, branch }
   }
 

@@ -1,3 +1,7 @@
+import {
+  buildGitBranchCheckoutArgv,
+  type GitBranchCheckoutCreate
+} from '../../shared/git-branch-checkout'
 import type { GitRuntimeOptions } from './git-runtime-options'
 import { gitOptionsForWorktree } from './git-runtime-options'
 import { gitExecFileAsync } from './runner'
@@ -15,7 +19,7 @@ export function assertValidBranchName(branch: string): void {
 }
 
 /**
- * Switch the worktree to an existing local branch. Git itself refuses (and
+ * Switch the worktree to a local branch, or create one with `create`. Git itself refuses (and
  * surfaces a "would be overwritten by checkout" error) when uncommitted changes
  * would conflict, so we let that message propagate to the caller rather than
  * forcing — mobile shows it as a toast. Flag-injection is prevented by
@@ -25,11 +29,13 @@ export function assertValidBranchName(branch: string): void {
 export async function checkoutBranch(
   worktreePath: string,
   branch: string,
-  options: GitRuntimeOptions = {}
+  options: GitRuntimeOptions = {},
+  create?: GitBranchCheckoutCreate
 ): Promise<void> {
   assertValidBranchName(branch)
+  const argv = buildGitBranchCheckoutArgv({ branch, ...(create ? { create } : {}) })
   await runWithGitReadCacheInvalidation(() =>
-    gitExecFileAsync(['checkout', branch, '--'], gitOptionsForWorktree(worktreePath, options))
+    gitExecFileAsync(argv, gitOptionsForWorktree(worktreePath, options))
   )
 }
 

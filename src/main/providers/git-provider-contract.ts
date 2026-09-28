@@ -13,6 +13,7 @@ import type {
 import type { GitStageWorktreeScope } from '../../shared/git-stage-worktree-scope'
 import type { RemoveWorktreeResult } from '../../shared/worktree/create-types'
 import type { GitPushTarget, GitWorktreeInfo } from '../../shared/worktree/types'
+import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
 import type { CommitMessageDraftContext } from '../../shared/commit-message-generation'
 import type { GitProviderStatusOptions } from './git-provider-status-options'
@@ -50,7 +51,11 @@ export type IGitProvider = {
   detectConflictOperation(worktreePath: string): Promise<GitConflictOperation>
   abortMerge(worktreePath: string): Promise<void>
   abortRebase(worktreePath: string): Promise<void>
-  checkoutBranch(worktreePath: string, branch: string): Promise<void>
+  checkoutBranch(
+    worktreePath: string,
+    branch: string,
+    create?: GitBranchCheckoutCreate
+  ): Promise<void>
   listLocalBranches(worktreePath: string): Promise<{ current: string | null; branches: string[] }>
   getBranchCompare(
     worktreePath: string,

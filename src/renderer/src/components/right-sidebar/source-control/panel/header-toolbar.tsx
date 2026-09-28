@@ -13,6 +13,7 @@ import { translate } from '@/i18n/i18n'
 import type { WorktreeGitIdentityDisplay } from '@/lib/worktree-git-identity-display'
 import { HostedReviewHeaderLink, HostedReviewIcon } from '../review/hosted-review-header-chrome'
 import { SourceControlBranchContextRow } from './branch-context-row'
+import type { SourceControlBranchSwitchTarget } from './branch-switcher'
 import { shouldShowSourceControlBranchContextChrome } from './branch-context-stats'
 import { SourceControlHeaderOverflowMenu } from './header-overflow-menu'
 
@@ -42,6 +43,7 @@ type SourceControlHeaderToolbarProps = {
   headDisplay?: WorktreeGitIdentityDisplay | null
   manualReviewUrl?: string | null
   branchLineTotal?: GitBranchLineTotal | null
+  branchSwitch?: SourceControlBranchSwitchTarget | null
 }
 
 function HostedReviewToolbarLink({
@@ -163,7 +165,8 @@ export function SourceControlHeaderToolbar({
   compareBaseRef,
   headDisplay = null,
   manualReviewUrl,
-  branchLineTotal
+  branchLineTotal,
+  branchSwitch
 }: SourceControlHeaderToolbarProps): React.JSX.Element {
   const filterInputRef = useRef<HTMLInputElement>(null)
   const normalizedFilter = filterQuery.trim()
@@ -315,6 +318,7 @@ export function SourceControlHeaderToolbar({
             headDisplay={headDisplay}
             manualReviewUrl={manualReviewUrl}
             branchLineTotal={branchLineTotal}
+            branchSwitch={branchSwitch}
             onChangeBaseRef={onChangeBaseRef}
             onRetry={onRefreshBranchCompare}
           />

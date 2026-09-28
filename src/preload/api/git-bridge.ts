@@ -4,6 +4,8 @@ import type { GitStagingArea, GitUpstreamStatus } from '../../shared/git-status-
 import type { GitPushTarget } from '../../shared/worktree/types'
 import type { GitStageWorktreeScope } from '../../shared/git-stage-worktree-scope'
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
+import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
+import type { RuntimeGitLocalBranches } from '../../shared/runtime-types'
 import type { PreloadApi } from '../api-types'
 
 export const gitApi = {
@@ -50,6 +52,16 @@ export const gitApi = {
     ipcRenderer.invoke('git:abortMerge', args),
   abortRebase: (args: { worktreePath: string; connectionId?: string }): Promise<void> =>
     ipcRenderer.invoke('git:abortRebase', args),
+  localBranches: (args: {
+    worktreePath: string
+    connectionId?: string
+  }): Promise<RuntimeGitLocalBranches> => ipcRenderer.invoke('git:localBranches', args),
+  checkout: (args: {
+    worktreePath: string
+    branch: string
+    create?: GitBranchCheckoutCreate
+    connectionId?: string
+  }): Promise<void> => ipcRenderer.invoke('git:checkout', args),
   diff: (args: {
     worktreePath: string
     filePath: string
