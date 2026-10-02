@@ -18222,6 +18222,13 @@
       "tooltip": "Switch branch ({{name}})",
       "disabledConflict": "Finish or abort the {{operation}} before switching branches",
       "disabledRemote": "Wait for the running git operation to finish"
+    },
+    "branchSync": {
+      "forcePushTooltip": "Remote only has older copies of local commits. Click to force push with lease.",
+      "upstreamFallback": "upstream",
+      "upToDate": "Up to date with {{upstream}}. Click to sync.",
+      "syncTooltip": "Sync with {{upstream}}: {{behind}} to pull, {{ahead}} to push",
+      "publishTooltip": "Publish branch"
     }
   },
   "agentsSidebarIntro": {

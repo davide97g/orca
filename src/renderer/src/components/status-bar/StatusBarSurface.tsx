@@ -22,6 +22,7 @@ import { SkillUpdateStatusSegment } from './SkillUpdateStatusSegment'
 import { NativeChatResumeStatusSegment } from './NativeChatResumeStatusSegment'
 import { CaffeinateStatusSegment } from './CaffeinateStatusSegment'
 import { RemoteServerUpdateStatusSegment } from './RemoteServerUpdateStatusSegment'
+import { BranchSyncStatusSegment } from './BranchSyncStatusSegment'
 import { TOGGLE_FLOATING_TERMINAL_EVENT } from '@/lib/floating-terminal'
 import { FloatingTerminalIconContextMenu } from '@/components/floating-terminal/FloatingTerminalIconContextMenu'
 import { ClaudeSwitcherMenu } from './ClaudeSwitcherMenu'
@@ -107,7 +108,8 @@ export function StatusBarSurface({
         setMenuOpen(true)
       }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <BranchSyncStatusSegment iconOnly={iconOnly} />
         {isEmptyUsageState ? (
           showEmptyUsageCta ? (
             <StatusBarUsageEmptyCta />
