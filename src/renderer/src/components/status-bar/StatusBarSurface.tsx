@@ -21,6 +21,7 @@ import { SkillUpdateStatusSegment } from './SkillUpdateStatusSegment'
 import { NativeChatResumeStatusSegment } from './NativeChatResumeStatusSegment'
 import { CaffeinateStatusSegment } from './CaffeinateStatusSegment'
 import { RemoteServerUpdateStatusSegment } from './RemoteServerUpdateStatusSegment'
+import { BranchSyncStatusSegment } from './BranchSyncStatusSegment'
 import { TOGGLE_FLOATING_TERMINAL_EVENT } from '@/lib/floating-terminal'
 import { FloatingTerminalIconContextMenu } from '@/components/floating-terminal/FloatingTerminalIconContextMenu'
 import { ClaudeSwitcherMenu } from './ClaudeSwitcherMenu'
@@ -114,6 +115,7 @@ export function StatusBarSurface({
         setMenuOpen(true)
       }}
     >
+      <BranchSyncStatusSegment iconOnly={segmentsIconOnly} />
       {/* Why: usage gives way first — what it drops stays one click away in its popover. */}
       <div
         className="status-bar-usage-cluster flex min-w-0 flex-1 items-center overflow-clip [overflow-clip-margin:3px]"

@@ -23,6 +23,7 @@ import type { GitBranchCheckoutRequest } from '../../../../../../shared/git-bran
 import type { BaseRefSearchResult } from '../../../../../../shared/repo-types'
 import type { RuntimeGitLocalBranches } from '../../../../../../shared/runtime-types'
 import type { Worktree } from '../../../../../../shared/worktree/types'
+import type { BranchSyncControl } from './branch-sync-button'
 import {
   buildBranchSwitchCandidates,
   type BranchSwitchSiblingWorktree
@@ -42,6 +43,8 @@ export type SourceControlBranchSwitchTarget = {
   /** Non-null while switching would be unsafe (merge/rebase in progress, remote op running). */
   disabledReason: string | null
   onSwitched: () => void
+  /** Ahead/behind sync control rendered beside the picker; null until upstream status resolves. */
+  sync?: BranchSyncControl | null
 }
 
 type BranchSwitchListProps = {
@@ -242,13 +245,24 @@ function describeCheckoutRequest(request: GitBranchCheckoutRequest): string {
       })
 }
 
+export type BranchSwitcherTriggerState = {
+  label: string
+  pending: boolean
+  disabled: boolean
+}
+
 /** VS Code-style branch picker behind the Source Control header's branch name. */
 export function SourceControlBranchSwitcher({
   branchName,
-  target
+  target,
+  side = 'bottom',
+  renderTrigger
 }: {
   branchName: string
   target: SourceControlBranchSwitchTarget
+  side?: 'top' | 'bottom'
+  /** Must render a single focusable element; it becomes the popover + tooltip trigger. */
+  renderTrigger?: (state: BranchSwitcherTriggerState) => React.ReactElement
 }): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const [pendingBranch, setPendingBranch] = useState<string | null>(null)
@@ -292,34 +306,43 @@ export function SourceControlBranchSwitcher({
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
-            <button
-              type="button"
-              className={cn(
-                'flex min-w-0 max-w-full items-center gap-1 rounded-sm border-0 bg-transparent p-0 text-left font-mono text-[10.5px] font-medium text-foreground/90 outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring',
-                disabled && 'cursor-default'
-              )}
-              aria-label={translate(
-                'auto.components.right.sidebar.SourceControl.a4e93c21d7',
-                'Current branch: {{value0}}',
-                { value0: branchName }
-              )}
-              aria-disabled={disabled || undefined}
-              data-testid="source-control-head-identity"
-            >
-              <span className="min-w-0 truncate">{pendingBranch ?? branchName}</span>
-              {pendingBranch ? (
-                <Loader2 className="size-3 shrink-0 animate-spin text-muted-foreground" />
-              ) : (
-                <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
-              )}
-            </button>
+            {renderTrigger ? (
+              renderTrigger({
+                label: pendingBranch ?? branchName,
+                pending: pendingBranch !== null,
+                disabled
+              })
+            ) : (
+              <button
+                type="button"
+                className={cn(
+                  'flex min-w-0 max-w-full items-center gap-1 rounded-sm border-0 bg-transparent p-0 text-left font-mono text-[10.5px] font-medium text-foreground/90 outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring',
+                  disabled && 'cursor-default'
+                )}
+                aria-label={translate(
+                  'auto.components.right.sidebar.SourceControl.a4e93c21d7',
+                  'Current branch: {{value0}}',
+                  { value0: branchName }
+                )}
+                aria-disabled={disabled || undefined}
+                data-testid="source-control-head-identity"
+              >
+                <span className="min-w-0 truncate">{pendingBranch ?? branchName}</span>
+                {pendingBranch ? (
+                  <Loader2 className="size-3 shrink-0 animate-spin text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
+                )}
+              </button>
+            )}
           </PopoverTrigger>
         </TooltipTrigger>
-        <TooltipContent side="bottom" sideOffset={6} className="max-w-72 break-all font-mono">
+        <TooltipContent side={side} sideOffset={6} className="max-w-72 break-all">
           {tooltip}
         </TooltipContent>
       </Tooltip>
       <PopoverContent
+        side={side}
         align="start"
         className="flex w-80 max-w-[calc(100vw-2rem)] flex-col"
         onOpenAutoFocus={(event) => {
