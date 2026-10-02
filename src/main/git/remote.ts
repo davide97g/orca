@@ -6,7 +6,7 @@ import { resolveEffectiveGitUpstream } from '../../shared/git-effective-upstream
 import { resolveConfiguredGitPushTarget } from '../../shared/git-push-target-resolution'
 import type { GitPushTarget } from '../../shared/worktree/types'
 import type { GitRuntimeOptions } from './git-runtime-options'
-import { gitOptionsForWorktree } from './git-runtime-options'
+import { gitNetworkOptionsForWorktree, gitOptionsForWorktree } from './git-runtime-options'
 import {
   postponeRepoRefMaintenance,
   withRepoRefMaintenancePaused
@@ -54,7 +54,7 @@ export async function gitPush(
       '--set-upstream',
       ...(target ? [target.remote, target.refspec] : ['origin', 'HEAD'])
     ]
-    await gitExecFileAsync(args, gitOptionsForWorktree(worktreePath, options))
+    await gitExecFileAsync(args, gitNetworkOptionsForWorktree(worktreePath, options))
   } catch (error) {
     throw new Error(normalizeGitErrorMessage(error, 'push'))
   }
@@ -71,7 +71,7 @@ async function gitPullWithArgs(
       const target = await validateGitPushTarget(worktreePath, pushTarget, options)
       await gitExecFileAsync(
         ['pull', ...effectiveArgs, target.remoteName, target.branchName],
-        gitOptionsForWorktree(worktreePath, options)
+        gitNetworkOptionsForWorktree(worktreePath, options)
       )
       return
     }
@@ -83,12 +83,15 @@ async function gitPullWithArgs(
       // target origin/<branch>. Pull the same effective branch the UI reports.
       await gitExecFileAsync(
         ['pull', ...effectiveArgs, upstream.remoteName, upstream.branchName],
-        gitOptionsForWorktree(worktreePath, options)
+        gitNetworkOptionsForWorktree(worktreePath, options)
       )
       return
     }
 
-    await gitExecFileAsync(['pull', ...effectiveArgs], gitOptionsForWorktree(worktreePath, options))
+    await gitExecFileAsync(
+      ['pull', ...effectiveArgs],
+      gitNetworkOptionsForWorktree(worktreePath, options)
+    )
   }
 
   try {
@@ -148,13 +151,17 @@ export async function gitFetch(
           worktreePath,
           target.remoteName,
           () =>
-            gitExecFileAsync(['fetch', '--prune', target.remoteName], runtimeOptions).then(
-              () => undefined
-            )
+            gitExecFileAsync(
+              ['fetch', '--prune', target.remoteName],
+              gitNetworkOptionsForWorktree(worktreePath, options)
+            ).then(() => undefined)
         )
         return
       }
-      await gitExecFileAsync(['fetch', '--prune'], gitOptionsForWorktree(worktreePath, options))
+      await gitExecFileAsync(
+        ['fetch', '--prune'],
+        gitNetworkOptionsForWorktree(worktreePath, options)
+      )
     })
   } catch (error) {
     throw new Error(normalizeGitErrorMessage(error, 'fetch'))

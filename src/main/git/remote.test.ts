@@ -17,6 +17,11 @@ const REBASE_OPERATION_OPTIONS = {
   terminationBarrier: true,
   captureWslLoginShellOutput: true
 }
+const REBASE_FETCH_OPTIONS = {
+  ...REBASE_OPERATION_OPTIONS,
+  useConfiguredSshCommandForNetwork: true,
+  timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS
+}
 
 describe('git remote operations', () => {
   beforeEach(() => {
@@ -32,7 +37,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'origin', 'HEAD'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -58,7 +63,7 @@ describe('git remote operations', () => {
     expect(gitExecFileAsyncMock).toHaveBeenCalledWith(['config', '--list', '-z'], { cwd: '/repo' })
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'pr-prateek-orca', 'HEAD:prateek/fix-sidebar-agents-toggle'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -84,11 +89,11 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).not.toHaveBeenCalledWith(
       ['push', '--set-upstream', 'fork', 'HEAD:main'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'origin', 'HEAD'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -114,7 +119,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'fork', 'HEAD:main'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -150,7 +155,7 @@ describe('git remote operations', () => {
         'https://github.com/pynickle/orca.git',
         'HEAD:imp/chinese-translation'
       ],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -194,7 +199,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'pr-pynickle-orca', 'HEAD:imp/chinese-translation'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -241,7 +246,7 @@ describe('git remote operations', () => {
     expect(remoteReads.map(([args]) => args)).toEqual([['remote', '-v']])
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--set-upstream', 'pr-pynickle-orca', 'HEAD:imp/chinese-translation'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -257,11 +262,14 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).toHaveBeenCalledWith(
       ['push', '--set-upstream', 'origin', 'HEAD:contributor/fix-sidebar'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'contributor/fix-sidebar'], { cwd: '/repo' }],
-      [['push', '--set-upstream', 'origin', 'HEAD:contributor/fix-sidebar'], { cwd: '/repo' }]
+      [
+        ['push', '--set-upstream', 'origin', 'HEAD:contributor/fix-sidebar'],
+        { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
+      ]
     ])
   })
 
@@ -278,7 +286,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock).toHaveBeenLastCalledWith(
       ['push', '--force-with-lease', '--set-upstream', 'origin', 'HEAD:feature'],
-      { cwd: '/repo' }
+      { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
     )
   })
 
@@ -408,7 +416,7 @@ describe('git remote operations', () => {
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['symbolic-ref', '--quiet', '--short', 'HEAD'], { cwd: '/repo' }],
       [['rev-parse', '--abbrev-ref', 'HEAD@{u}'], { cwd: '/repo' }],
-      [['pull'], { cwd: '/repo' }]
+      [['pull'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -431,10 +439,10 @@ describe('git remote operations', () => {
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['symbolic-ref', '--quiet', '--short', 'HEAD'], { cwd: '/repo' }],
       [['rev-parse', '--abbrev-ref', 'HEAD@{u}'], { cwd: '/repo' }],
-      [['pull'], { cwd: '/repo' }],
+      [['pull'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }],
       [['symbolic-ref', '--quiet', '--short', 'HEAD'], { cwd: '/repo' }],
       [['rev-parse', '--abbrev-ref', 'HEAD@{u}'], { cwd: '/repo' }],
-      [['pull', '--no-rebase'], { cwd: '/repo' }]
+      [['pull', '--no-rebase'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -468,9 +476,12 @@ describe('git remote operations', () => {
     // The merge flag is spliced ahead of the positional remote/branch args.
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['pull', 'fork', 'feature/fix'], { cwd: '/repo' }],
+      [['pull', 'fork', 'feature/fix'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }],
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['pull', '--no-rebase', 'fork', 'feature/fix'], { cwd: '/repo' }]
+      [
+        ['pull', '--no-rebase', 'fork', 'feature/fix'],
+        { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
+      ]
     ])
   })
 
@@ -509,7 +520,7 @@ describe('git remote operations', () => {
       [['symbolic-ref', '--quiet', '--short', 'HEAD'], { cwd: '/repo' }],
       [['rev-parse', '--abbrev-ref', 'HEAD@{u}'], { cwd: '/repo' }],
       [['rev-parse', '--verify', '--quiet', 'refs/remotes/origin/feature'], { cwd: '/repo' }],
-      [['pull', 'origin', 'feature'], { cwd: '/repo' }]
+      [['pull', 'origin', 'feature'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -525,7 +536,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['pull', 'fork', 'feature/fix'], { cwd: '/repo' }]
+      [['pull', 'fork', 'feature/fix'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -540,7 +551,7 @@ describe('git remote operations', () => {
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['symbolic-ref', '--quiet', '--short', 'HEAD'], { cwd: '/repo' }],
       [['rev-parse', '--abbrev-ref', 'HEAD@{u}'], { cwd: '/repo' }],
-      [['pull', '--ff-only'], { cwd: '/repo' }]
+      [['pull', '--ff-only'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -556,7 +567,10 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['pull', '--ff-only', 'fork', 'feature/fix'], { cwd: '/repo' }]
+      [
+        ['pull', '--ff-only', 'fork', 'feature/fix'],
+        { cwd: '/repo', useConfiguredSshCommandForNetwork: true }
+      ]
     ])
   })
 
@@ -586,7 +600,7 @@ describe('git remote operations', () => {
           expect.stringMatching(/^\+refs\/heads\/main:refs\/orca\/rebase\//),
           '+refs/heads/main:refs/remotes/upstream/main'
         ],
-        { ...REBASE_OPERATION_OPTIONS, timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS }
+        REBASE_FETCH_OPTIONS
       ],
       [
         ['rebase', '--onto', expect.stringMatching(/^refs\/orca\/rebase\//), 'fork-point'],
@@ -644,7 +658,7 @@ describe('git remote operations', () => {
         expect.stringMatching(/^\+refs\/heads\/main:refs\/orca\/rebase\//),
         '+refs/heads/main:refs/remotes/upstream/main'
       ],
-      { ...REBASE_OPERATION_OPTIONS, timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS }
+      REBASE_FETCH_OPTIONS
     )
   })
 
@@ -707,7 +721,7 @@ describe('git remote operations', () => {
     expect(gitExecFileAsyncMock).toHaveBeenNthCalledWith(
       5,
       ['fetch', 'upstream', ...preferredRefspecs],
-      { ...REBASE_OPERATION_OPTIONS, timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS }
+      REBASE_FETCH_OPTIONS
     )
   })
 
@@ -765,7 +779,10 @@ describe('git remote operations', () => {
 
     await gitFetch('/repo')
 
-    expect(gitExecFileAsyncMock).toHaveBeenCalledWith(['fetch', '--prune'], { cwd: '/repo' })
+    expect(gitExecFileAsyncMock).toHaveBeenCalledWith(['fetch', '--prune'], {
+      cwd: '/repo',
+      useConfiguredSshCommandForNetwork: true
+    })
   })
 
   it('passes the selected WSL distro through fetch validation and execution', async () => {
@@ -784,7 +801,10 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo', wslDistro: 'Ubuntu' }],
-      [['fetch', '--prune', 'fork'], { cwd: '/repo', wslDistro: 'Ubuntu' }]
+      [
+        ['fetch', '--prune', 'fork'],
+        { cwd: '/repo', wslDistro: 'Ubuntu', useConfiguredSshCommandForNetwork: true }
+      ]
     ])
   })
 
@@ -800,7 +820,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['fetch', '--prune', 'fork'], { cwd: '/repo' }]
+      [['fetch', '--prune', 'fork'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
@@ -816,7 +836,7 @@ describe('git remote operations', () => {
 
     expect(gitExecFileAsyncMock.mock.calls).toEqual([
       [['check-ref-format', '--branch', 'feature/fix'], { cwd: '/repo' }],
-      [['fetch', '--prune', 'foo/bar'], { cwd: '/repo' }]
+      [['fetch', '--prune', 'foo/bar'], { cwd: '/repo', useConfiguredSshCommandForNetwork: true }]
     ])
   })
 
