@@ -36,3 +36,21 @@ export function gitReadOptionsForWorktree(
 } {
   return { ...gitOptionsForWorktree(cwd, options), preferWslDirectGit: true }
 }
+
+/**
+ * Options for a git invocation that talks to a remote. Without the opt-in, the
+ * BatchMode `GIT_SSH_COMMAND` guard overrides the repo's `core.sshCommand`, so a
+ * per-repo SSH key (e.g. via `includeIf`) is dropped and auth uses the wrong account.
+ */
+export function gitNetworkOptionsForWorktree(
+  cwd: string,
+  options: GitRuntimeOptions = {}
+): {
+  cwd: string
+  wslDistro?: string
+  signal?: AbortSignal
+  admissionTier?: GitAdmissionTier
+  useConfiguredSshCommandForNetwork: true
+} {
+  return { ...gitOptionsForWorktree(cwd, options), useConfiguredSshCommandForNetwork: true }
+}

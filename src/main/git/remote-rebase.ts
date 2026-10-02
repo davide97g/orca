@@ -70,11 +70,13 @@ async function gitPullRebaseFromBaseUnlocked(
             () =>
               gitExecFileAsync(['fetch', '--no-write-fetch-head', ...fetchArgs], {
                 ...operationOptions,
+                useConfiguredSshCommandForNetwork: true,
                 timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS
               }),
             () =>
               gitExecFileAsync(['fetch', ...fetchArgs], {
                 ...operationOptions,
+                useConfiguredSshCommandForNetwork: true,
                 timeout: REBASE_SOURCE_FETCH_TIMEOUT_MS
               }),
             isNoWriteFetchHeadUnsupportedError
