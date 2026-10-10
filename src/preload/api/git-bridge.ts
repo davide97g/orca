@@ -6,6 +6,7 @@ import type { GitStageWorktreeScope } from '../../shared/git-stage-worktree-scop
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
 import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
 import type { RuntimeGitLocalBranches } from '../../shared/runtime-types'
+import type { GitStashList, GitStashMutation, GitStashMutationResult } from '../../shared/git-stash'
 import type { PreloadApi } from '../api-types'
 
 export const gitApi = {
@@ -62,6 +63,13 @@ export const gitApi = {
     create?: GitBranchCheckoutCreate
     connectionId?: string
   }): Promise<void> => ipcRenderer.invoke('git:checkout', args),
+  stashList: (args: { worktreePath: string; connectionId?: string }): Promise<GitStashList> =>
+    ipcRenderer.invoke('git:stashList', args),
+  stash: (args: {
+    worktreePath: string
+    mutation: GitStashMutation
+    connectionId?: string
+  }): Promise<GitStashMutationResult> => ipcRenderer.invoke('git:stash', args),
   diff: (args: {
     worktreePath: string
     filePath: string

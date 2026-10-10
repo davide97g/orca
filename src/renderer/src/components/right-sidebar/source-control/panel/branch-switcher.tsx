@@ -16,7 +16,11 @@ import { extractIpcErrorMessage } from '@/lib/ipc-error'
 import { activateAndRevealWorktree } from '@/lib/worktree-activation'
 import { cn } from '@/lib/utils'
 import type { RuntimeGitSettings } from '@/runtime/runtime-git-client-context'
-import { checkoutRuntimeGitBranch, listRuntimeGitLocalBranches } from '@/runtime/runtime-git-client'
+import {
+  checkoutRuntimeGitBranch,
+  listRuntimeGitLocalBranches,
+  runRuntimeGitStashMutation
+} from '@/runtime/runtime-git-client'
 import { searchRuntimeRepoBaseRefDetails } from '@/runtime/runtime-repo-client'
 import { useAppStore } from '@/store'
 import type { GitBranchCheckoutRequest } from '../../../../../../shared/git-branch-checkout'
@@ -235,6 +239,10 @@ function BranchSwitchList({
   )
 }
 
+// Why: git's refusal when uncommitted changes would be overwritten; stashing them unblocks the switch.
+const CHECKOUT_BLOCKED_BY_LOCAL_CHANGES =
+  /would be overwritten by checkout|commit your changes or stash them/
+
 function describeCheckoutRequest(request: GitBranchCheckoutRequest): string {
   return request.create
     ? translate('sourceControl.branchSwitcher.createFailed', 'Could not create branch {{name}}', {
@@ -269,22 +277,32 @@ export function SourceControlBranchSwitcher({
   const disabled = target.disabledReason !== null || pendingBranch !== null
 
   const runCheckout = useCallback(
-    async (request: GitBranchCheckoutRequest): Promise<void> => {
+    async (request: GitBranchCheckoutRequest, stashFirst = false): Promise<void> => {
       setOpen(false)
       setPendingBranch(request.branch)
+      const context = {
+        settings: target.settings,
+        worktreeId: target.worktreeId,
+        worktreePath: target.worktreePath,
+        connectionId: target.connectionId
+      }
       try {
-        await checkoutRuntimeGitBranch(
-          {
-            settings: target.settings,
-            worktreeId: target.worktreeId,
-            worktreePath: target.worktreePath,
-            connectionId: target.connectionId
-          },
-          request
-        )
+        if (stashFirst) {
+          await runRuntimeGitStashMutation(context, { kind: 'push', mode: 'include-untracked' })
+        }
+        await checkoutRuntimeGitBranch(context, request)
       } catch (error) {
+        const description = extractIpcErrorMessage(error, request.branch)
         toast.error(describeCheckoutRequest(request), {
-          description: extractIpcErrorMessage(error, request.branch)
+          description,
+          ...(!stashFirst && CHECKOUT_BLOCKED_BY_LOCAL_CHANGES.test(description)
+            ? {
+                action: {
+                  label: translate('sourceControl.branchSwitcher.stashAndSwitch', 'Stash & Switch'),
+                  onClick: () => void runCheckout(request, true)
+                }
+              }
+            : {})
         })
       } finally {
         setPendingBranch(null)

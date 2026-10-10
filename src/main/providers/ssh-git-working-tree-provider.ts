@@ -3,6 +3,7 @@ import type {
   GitCommitCompareResult
 } from '../../shared/git-diff-compare-types'
 import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
+import type { GitStashList, GitStashMutation, GitStashMutationResult } from '../../shared/git-stash'
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
 import type { GitConflictOperation } from '../../shared/git-status-types'
 import {
@@ -131,6 +132,22 @@ export class SshGitWorkingTreeProvider extends SshGitNoninteractiveProvider {
       current: string | null
       branches: string[]
     }
+  }
+
+  async listStashes(worktreePath: string): Promise<GitStashList> {
+    // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: the relay's git.stashList handler returns listGitStashes' GitStashList.
+    return (await this.mux.request('git.stashList', { worktreePath })) as GitStashList
+  }
+
+  async runStashMutation(
+    worktreePath: string,
+    mutation: GitStashMutation
+  ): Promise<GitStashMutationResult> {
+    return this.runWithGitReadInvalidation(
+      async () =>
+        // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: the relay's git.stash handler returns runGitStashMutation's result.
+        (await this.mux.request('git.stash', { worktreePath, mutation })) as GitStashMutationResult
+    )
   }
 
   async getBranchCompare(

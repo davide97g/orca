@@ -16,6 +16,7 @@ import {
   GitRebaseFromBase,
   GitRemoteCommitUrl,
   GitRemoteFileUrl,
+  GitStash,
   GitStatusParams,
   GitSubmoduleStatus,
   GitTargetedRemote,
@@ -115,6 +116,19 @@ export const GIT_METHODS = [
     permission: 'workspace',
     params: WorktreeSelector,
     handler: async (params, { runtime }) => runtime.listRuntimeGitLocalBranches(params.worktree)
+  }),
+  defineMethod({
+    name: 'git.stashList',
+    permission: 'workspace',
+    params: WorktreeSelector,
+    handler: async (params, { runtime }) => runtime.listRuntimeGitStashes(params.worktree)
+  }),
+  defineMethod({
+    name: 'git.stash',
+    permission: 'workspace',
+    params: GitStash,
+    handler: async (params, { runtime }) =>
+      runtime.runRuntimeGitStashMutation(params.worktree, params.mutation)
   }),
   ...GIT_DIFF_METHODS,
   defineMethod({

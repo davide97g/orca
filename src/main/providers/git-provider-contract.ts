@@ -14,6 +14,7 @@ import type { GitStageWorktreeScope } from '../../shared/git-stage-worktree-scop
 import type { RemoveWorktreeResult } from '../../shared/worktree/create-types'
 import type { GitPushTarget, GitWorktreeInfo } from '../../shared/worktree/types'
 import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
+import type { GitStashList, GitStashMutation, GitStashMutationResult } from '../../shared/git-stash'
 import type { GitHistoryOptions, GitHistoryResult } from '../../shared/git-history'
 import type { CommitMessageDraftContext } from '../../shared/commit-message-generation'
 import type { GitProviderStatusOptions } from './git-provider-status-options'
@@ -57,6 +58,11 @@ export type IGitProvider = {
     create?: GitBranchCheckoutCreate
   ): Promise<void>
   listLocalBranches(worktreePath: string): Promise<{ current: string | null; branches: string[] }>
+  listStashes(worktreePath: string): Promise<GitStashList>
+  runStashMutation(
+    worktreePath: string,
+    mutation: GitStashMutation
+  ): Promise<GitStashMutationResult>
   getBranchCompare(
     worktreePath: string,
     baseRef: string,

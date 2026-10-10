@@ -19251,7 +19251,8 @@
       "switchFailed": "Could not switch to {{name}}",
       "tooltip": "Switch branch ({{name}})",
       "disabledConflict": "Finish or abort the {{operation}} before switching branches",
-      "disabledRemote": "Wait for the running git operation to finish"
+      "disabledRemote": "Wait for the running git operation to finish",
+      "stashAndSwitch": "Stash & Switch"
     },
     "branchSync": {
       "forcePushTooltip": "Remote only has older copies of local commits. Click to force push with lease.",
@@ -19259,6 +19260,40 @@
       "upToDate": "Up to date with {{upstream}}. Click to sync.",
       "syncTooltip": "Sync with {{upstream}}: {{behind}} to pull, {{ahead}} to push",
       "publishTooltip": "Publish branch"
+    },
+    "stash": {
+      "push": "Stash",
+      "pushIncludeUntracked": "Stash (Include Untracked)",
+      "pushStaged": "Stash Staged",
+      "messageDescription": "Optionally describe the stash. Leave empty to use the default message.",
+      "messagePlaceholder": "Stash message",
+      "cancel": "Cancel",
+      "clearConfirmTitle": "Drop all {{count}} stashes?",
+      "dropConfirmTitle": "Drop this stash?",
+      "dropConfirmDescription": "This cannot be undone.",
+      "clear": "Drop All Stashes",
+      "drop": "Drop Stash",
+      "menu": "Stash",
+      "applyLatest": "Apply Latest Stash",
+      "popLatest": "Pop Latest Stash",
+      "apply": "Apply Stash",
+      "pop": "Pop Stash",
+      "sectionTitle": "Stashes",
+      "refresh": "Refresh stashes",
+      "pushFailed": "Could not stash changes",
+      "applyFailed": "Could not apply stash",
+      "popFailed": "Could not pop stash",
+      "dropFailed": "Could not drop stash",
+      "clearFailed": "Could not drop stashes",
+      "pushed": "Changes stashed",
+      "nothingToStash": "No local changes to stash",
+      "applied": "Stash applied",
+      "popped": "Stash popped",
+      "dropped": "Stash dropped",
+      "cleared": "All stashes dropped",
+      "stagedUnsupported": "Stash Staged needs Git 2.35 or newer.",
+      "viewFailed": "Could not open stash",
+      "disabledConflict": "Finish or abort the {{operation}} before using stashes"
     }
   },
   "agentsSidebarIntro": {

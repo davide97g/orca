@@ -19,6 +19,7 @@ export {
   GitRebaseFromBase,
   GitRemoteCommitUrl,
   GitRemoteFileUrl,
+  GitStash,
   GitStatusParams,
   GitSubmoduleStatus,
   GitTargetedRemote,

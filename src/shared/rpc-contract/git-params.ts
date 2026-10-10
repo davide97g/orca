@@ -272,6 +272,23 @@ export const GitCheckout = WorktreeSelector.extend({
     .optional()
 })
 
+const GitStashOid = z.string().regex(/^[0-9a-f]{40,64}$/, 'Invalid stash id')
+const GitStashIndex = z.number().int().min(0)
+
+export const GitStash = WorktreeSelector.extend({
+  mutation: z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('push'),
+      mode: z.enum(['tracked', 'include-untracked', 'staged']),
+      message: z.string().optional()
+    }),
+    z.object({ kind: z.literal('apply'), index: GitStashIndex, oid: GitStashOid }),
+    z.object({ kind: z.literal('pop'), index: GitStashIndex, oid: GitStashOid }),
+    z.object({ kind: z.literal('drop'), index: GitStashIndex, oid: GitStashOid }),
+    z.object({ kind: z.literal('clear') })
+  ])
+})
+
 export const GitRemoteFileUrl = WorktreeSelector.extend({
   relativePath: z
     .unknown()

@@ -2,6 +2,7 @@ import {
   buildGitBranchCheckoutArgv,
   parseGitBranchCheckoutCreate
 } from '../shared/git-branch-checkout'
+import { listGitStashes, parseGitStashMutation, runGitStashMutation } from '../shared/git-stash'
 import { GitHandlerOperationContext } from './git-handler-operation-context'
 import { commitChangesRelay } from './git-handler-worktree-ops'
 import { encodeGitPathspecs } from '../shared/git-pathspec-stdin'
@@ -154,5 +155,21 @@ export class GitHandlerWorktreeChangeOperations extends GitHandlerOperationConte
     }
     branches.sort((a, b) => (a === current ? -1 : b === current ? 1 : 0))
     return { current, branches }
+  }
+
+  async stashList(params: Record<string, unknown>) {
+    const worktreePath = params.worktreePath as string
+    return listGitStashes((argv) => this.git(argv, worktreePath))
+  }
+
+  async stash(params: Record<string, unknown>) {
+    const worktreePath = params.worktreePath as string
+    const mutation = parseGitStashMutation(params.mutation)
+    this.clearGitMutationReadCaches()
+    try {
+      return await runGitStashMutation((argv) => this.git(argv, worktreePath), mutation)
+    } finally {
+      this.clearGitMutationReadCaches()
+    }
   }
 }

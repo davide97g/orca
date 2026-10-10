@@ -1,5 +1,6 @@
 import type { GitBranchCheckoutCreate } from '../../shared/git-branch-checkout'
 import type { RuntimeGitLocalBranches } from '../../shared/runtime-types'
+import type { GitStashList, GitStashMutation, GitStashMutationResult } from '../../shared/git-stash'
 import type { GitForkSyncExpectedUpstream, GitForkSyncResult } from '../../shared/git-fork-sync'
 import type { TuiAgent } from '../../shared/tui-agent'
 import type { GitPushTarget } from '../../shared/worktree/types'
@@ -22,6 +23,12 @@ export type GitOperationApi = {
     create?: GitBranchCheckoutCreate
     connectionId?: string
   }) => Promise<void>
+  stashList: (args: { worktreePath: string; connectionId?: string }) => Promise<GitStashList>
+  stash: (args: {
+    worktreePath: string
+    mutation: GitStashMutation
+    connectionId?: string
+  }) => Promise<GitStashMutationResult>
   fetch: (args: {
     worktreePath: string
     connectionId?: string

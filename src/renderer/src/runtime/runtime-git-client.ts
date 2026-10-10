@@ -4,6 +4,10 @@ import {
   listRuntimeGitLocalBranches as listRuntimeGitLocalBranchesImplementation
 } from './runtime-git-branch-client'
 import {
+  listRuntimeGitStashes as listRuntimeGitStashesImplementation,
+  runRuntimeGitStashMutation as runRuntimeGitStashMutationImplementation
+} from './runtime-git-stash-client'
+import {
   getRuntimeGitBranchCompare as getRuntimeGitBranchCompareImplementation,
   getRuntimeGitBranchDiff as getRuntimeGitBranchDiffImplementation,
   getRuntimeGitCommitCompare as getRuntimeGitCommitCompareImplementation,
@@ -69,6 +73,8 @@ export const abortRuntimeGitMerge = abortRuntimeGitMergeImplementation
 export const abortRuntimeGitRebase = abortRuntimeGitRebaseImplementation
 export const listRuntimeGitLocalBranches = listRuntimeGitLocalBranchesImplementation
 export const checkoutRuntimeGitBranch = checkoutRuntimeGitBranchImplementation
+export const listRuntimeGitStashes = listRuntimeGitStashesImplementation
+export const runRuntimeGitStashMutation = runRuntimeGitStashMutationImplementation
 export const getRuntimeGitDiff = getRuntimeGitDiffImplementation
 export const getRuntimeGitBranchCompare = getRuntimeGitBranchCompareImplementation
 export const getRuntimeGitCommitCompare = getRuntimeGitCommitCompareImplementation

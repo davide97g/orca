@@ -13,6 +13,8 @@ const RPC_TO_RUNTIME_COMMAND = {
   'git.abortRebase': 'abortRuntimeGitRebase',
   'git.checkout': 'checkoutRuntimeGitBranch',
   'git.localBranches': 'listRuntimeGitLocalBranches',
+  'git.stashList': 'listRuntimeGitStashes',
+  'git.stash': 'runRuntimeGitStashMutation',
   'git.diff': 'getRuntimeGitDiff',
   'git.branchDiff': 'getRuntimeGitBranchDiff',
   'git.commitDiff': 'getRuntimeGitCommitDiff',

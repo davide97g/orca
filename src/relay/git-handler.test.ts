@@ -6,7 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { GitHandler } from './git-handler'
 import { RelayContext } from './context'
@@ -52,6 +52,8 @@ describe('GitHandler', () => {
     expect(methods).toContain('git.abortRebase')
     expect(methods).toContain('git.checkout')
     expect(methods).toContain('git.localBranches')
+    expect(methods).toContain('git.stashList')
+    expect(methods).toContain('git.stash')
     expect(methods).toContain('git.discard')
     expect(methods).toContain('git.bulkDiscard')
     expect(methods).toContain('git.conflictOperation')
@@ -230,6 +232,47 @@ describe('GitHandler', () => {
           stdio: 'pipe'
         }).trim()
       ).toBe(`refs/heads/${baseBranch}`)
+    })
+  })
+
+  describe('stashList / stash', () => {
+    it('stashes, lists and pops through the relay', async () => {
+      gitInit(tmpDir)
+      writeFileSync(path.join(tmpDir, 'file.txt'), 'base\n')
+      gitCommit(tmpDir, 'initial')
+      writeFileSync(path.join(tmpDir, 'file.txt'), 'changed\n')
+
+      await dispatcher.callRequest('git.stash', {
+        worktreePath: tmpDir,
+        mutation: { kind: 'push', mode: 'tracked', message: 'relay stash' }
+      })
+      expect(normalizeGitFileText(readFileSync(path.join(tmpDir, 'file.txt'), 'utf-8'))).toBe(
+        'base\n'
+      )
+      const listed = await dispatcher.callRequest('git.stashList', { worktreePath: tmpDir })
+      const oid = execFileSync('git', ['rev-parse', 'stash@{0}'], {
+        cwd: tmpDir,
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      }).trim()
+      expect(listed).toMatchObject({ entries: [{ index: 0, oid, message: 'relay stash' }] })
+
+      await dispatcher.callRequest('git.stash', {
+        worktreePath: tmpDir,
+        mutation: { kind: 'pop', index: 0, oid }
+      })
+      expect(normalizeGitFileText(readFileSync(path.join(tmpDir, 'file.txt'), 'utf-8'))).toBe(
+        'changed\n'
+      )
+    })
+
+    it('rejects a malformed mutation', async () => {
+      await expect(
+        dispatcher.callRequest('git.stash', {
+          worktreePath: tmpDir,
+          mutation: { kind: 'push', mode: '--all' }
+        })
+      ).rejects.toThrow('invalid_stash_mutation')
     })
   })
 

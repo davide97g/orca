@@ -8,10 +8,14 @@ import { CompareUnavailable } from '../sync/compare-summary'
 import { SourceControlCommitSurface } from './commit-surface'
 import { SourceControlForkPushNotice } from './fork-push-notice'
 import type { SourceControlPanelReadyProps } from './panel-props'
+import { SourceControlStashSection } from '../stash/stash-section'
+import type { SourceControlStashes } from '../stash/use-stashes'
 
 /** The scrolling surface: status, commit affordances, the file sections and the history dock. */
-export function SourceControlPanelContent(props: SourceControlPanelReadyProps) {
-  const { activeWorktree, currentWorktreeId, model, worktreePath } = props
+export function SourceControlPanelContent(
+  props: SourceControlPanelReadyProps & { stashes: SourceControlStashes | null }
+) {
+  const { activeWorktree, currentWorktreeId, model, stashes, worktreePath } = props
   const {
     activeConnectionId,
     activeOpenRowKeys,
@@ -177,6 +181,14 @@ export function SourceControlPanelContent(props: SourceControlPanelReadyProps) {
           diffCommentCountByPath={diffCommentCountByPath}
         />
       )}
+
+      {stashes ? (
+        <SourceControlStashSection
+          stashes={stashes}
+          collapsedSections={collapsedSections}
+          toggleSection={toggleSection}
+        />
+      ) : null}
 
       {shouldShowSourceControlCompareUnavailableCard(
         branchSummary,

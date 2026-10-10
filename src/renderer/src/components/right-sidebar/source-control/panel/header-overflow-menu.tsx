@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { translate } from '@/i18n/i18n'
+import { SourceControlStashMenu } from '../stash/stash-menu'
+import type { SourceControlStashes } from '../stash/use-stashes'
 
 export function SourceControlHeaderOverflowMenu({
   sourceControlViewMode,
@@ -20,7 +22,8 @@ export function SourceControlHeaderOverflowMenu({
   onRefreshBranchCompare,
   branchCompareRefreshDisabled,
   diffCommentCount,
-  onExpandNotes
+  onExpandNotes,
+  stashes = null
 }: {
   sourceControlViewMode: SourceControlViewMode
   viewModeToggleDisabled: boolean
@@ -30,6 +33,7 @@ export function SourceControlHeaderOverflowMenu({
   branchCompareRefreshDisabled: boolean
   diffCommentCount: number
   onExpandNotes: () => void
+  stashes?: SourceControlStashes | null
 }): React.JSX.Element {
   const viewModeLabel =
     sourceControlViewMode === 'tree'
@@ -84,6 +88,12 @@ export function SourceControlHeaderOverflowMenu({
             'Refresh branch compare'
           )}
         </DropdownMenuItem>
+        {stashes ? (
+          <>
+            <DropdownMenuSeparator />
+            <SourceControlStashMenu stashes={stashes} />
+          </>
+        ) : null}
         {diffCommentCount > 0 ? (
           <>
             <DropdownMenuSeparator />

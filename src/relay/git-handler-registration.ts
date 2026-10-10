@@ -23,6 +23,8 @@ export function registerGitHandlers(
   dispatcher.onRequest('git.abortRebase', (p) => handlers.changes.abortRebase(p))
   dispatcher.onRequest('git.checkout', (p) => handlers.changes.checkout(p))
   dispatcher.onRequest('git.localBranches', (p) => handlers.changes.localBranches(p))
+  dispatcher.onRequest('git.stashList', (p) => handlers.changes.stashList(p))
+  dispatcher.onRequest('git.stash', (p) => handlers.changes.stash(p))
   dispatcher.onRequest('git.discard', (p) => handlers.discard.discard(p))
   dispatcher.onRequest('git.bulkDiscard', (p) => handlers.discard.bulkDiscard(p))
   dispatcher.onRequest('git.conflictOperation', (p) => handlers.discard.conflictOperation(p))

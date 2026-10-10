@@ -113,15 +113,16 @@ export class RuntimeGitStatusCommands {
     const target = await this.host.resolveRuntimeGitTarget(worktreeSelector)
     const provider = requireRuntimeGitProvider(target)
     if (provider) {
-      await provider.checkoutBranch(target.worktree.path, branch, create)
+      // Why: forward `create` only when set so plain switches keep the original call shape.
+      await (create
+        ? provider.checkoutBranch(target.worktree.path, branch, create)
+        : provider.checkoutBranch(target.worktree.path, branch))
       return { ok: true, branch }
     }
-    await checkoutBranch(
-      target.worktree.path,
-      branch,
-      { ...localGitOptionsForTarget(target), admissionTier: 'interactive' },
-      create
-    )
+    const options = { ...localGitOptionsForTarget(target), admissionTier: 'interactive' as const }
+    await (create
+      ? checkoutBranch(target.worktree.path, branch, options, create)
+      : checkoutBranch(target.worktree.path, branch, options))
     return { ok: true, branch }
   }
 

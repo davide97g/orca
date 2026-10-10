@@ -3,7 +3,10 @@ import { toRuntimeWorktreeSelector } from '../../runtime/runtime-worktree-select
 import { callRuntimeResult } from './web-runtime-calls'
 import { resolveRuntimeWorktreeByPath } from './web-runtime-worktree-catalog'
 
-type WebGitBranchApi = Pick<NonNullable<PreloadApi['git']>, 'localBranches' | 'checkout'>
+type WebGitBranchApi = Pick<
+  NonNullable<PreloadApi['git']>,
+  'localBranches' | 'checkout' | 'stashList' | 'stash'
+>
 
 export function createGitBranchApi(): WebGitBranchApi {
   return {
@@ -19,6 +22,19 @@ export function createGitBranchApi(): WebGitBranchApi {
         worktree: toRuntimeWorktreeSelector(worktree.id),
         branch,
         ...(create ? { create } : {})
+      })
+    },
+    stashList: async ({ worktreePath }) => {
+      const worktree = await resolveRuntimeWorktreeByPath(worktreePath)
+      return callRuntimeResult('git.stashList', {
+        worktree: toRuntimeWorktreeSelector(worktree.id)
+      })
+    },
+    stash: async ({ worktreePath, mutation }) => {
+      const worktree = await resolveRuntimeWorktreeByPath(worktreePath)
+      return callRuntimeResult('git.stash', {
+        worktree: toRuntimeWorktreeSelector(worktree.id),
+        mutation
       })
     }
   }

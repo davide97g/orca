@@ -5,6 +5,8 @@ import { SourceControlPanelContent } from './panel-content'
 import { SourceControlPanelDialogs } from './panel-dialogs'
 import type { SourceControlPanelReadyProps } from './panel-props'
 import { useSourceControlBranchSwitchTarget } from './use-branch-switch-target'
+import { useSourceControlStashes } from '../stash/use-stashes'
+import { SourceControlStashDialogs } from '../stash/stash-dialogs'
 
 /** The panel chrome: toolbar, notes shelf, the scrolling file surface, bulk bar and dialog layer. */
 export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
@@ -56,6 +58,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
     visibleCreatePrHeaderAction
   } = model
   const branchSwitch = useSourceControlBranchSwitchTarget(model, worktreePath)
+  const stashes = useSourceControlStashes(model, worktreePath)
 
   return (
     <>
@@ -93,6 +96,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
           headDisplay={gitIdentityDisplay}
           manualReviewUrl={manualReviewUrl}
           branchSwitch={branchSwitch}
+          stashes={stashes}
         />
 
         {/* Why: hidden when count is 0 — notes are created from the diff view, so an empty Notes shelf here is pure chrome. */}
@@ -117,7 +121,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
           className="relative flex flex-1 flex-col overflow-auto scrollbar-sleek pt-1"
           style={{ paddingBottom: selectedKeys.size > 0 ? 50 : undefined }}
         >
-          <SourceControlPanelContent {...props} />
+          <SourceControlPanelContent {...props} stashes={stashes} />
         </div>
 
         {selectedKeys.size > 0 && (
@@ -134,6 +138,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
       </div>
 
       <SourceControlPanelDialogs {...props} />
+      {stashes ? <SourceControlStashDialogs stashes={stashes} /> : null}
     </>
   )
 }
