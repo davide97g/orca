@@ -1,8 +1,8 @@
 > [!NOTE]
-> **Fork of [stablyai/orca](https://github.com/stablyai/orca)** with Source Control extras: a VS Code-style branch switcher, a branch sync indicator, and per-repo SSH key support. Update, build and release steps: [FORK.md](FORK.md). Notarized macOS builds: [Releases](https://github.com/davide97g/orca/releases).
+> **Forca** is a fork of [stablyai/orca](https://github.com/stablyai/orca) with Source Control extras: a VS Code-style branch switcher, a branch sync indicator, stashes, and per-repo SSH key support. Update, build and release steps: [FORK.md](FORK.md). Notarized macOS builds: [Releases](https://github.com/davide97g/orca/releases).
 
 <h1 align="center">
-  <a href="https://onOrca.dev"><img src="resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
+  <a href="https://onOrca.dev"><img src="resources/build/icon.png" alt="Forca" width="64" valign="middle" /></a> Forca
 </h1>
 
 <p align="center">
