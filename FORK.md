@@ -8,6 +8,9 @@ features on top of an official release:
 - **Branch sync indicator** in Source Control and the status bar (#1).
 - **`core.sshCommand` support.** Source Control fetch, pull and push use the repo's configured SSH
   command, so per-repo SSH keys work (#2).
+- **Stashes.** A Stash submenu in the Source Control `…` menu (stash, include untracked, staged
+  only, apply/pop latest, drop all) and a Stashes section listing each stash with apply, pop, drop
+  and click-to-view. A branch switch blocked by local changes offers **Stash & Switch**.
 
 Everything lives on `main`, as a few commits on top of an official release:
 
@@ -19,6 +22,7 @@ Everything lives on `main`, as a few commits on top of an official release:
 | `docs: fork maintenance guide` | This file | No |
 | `feat(source-control): VS Code-style branch sync indicator` | Sync indicator (#1) | Yes |
 | `fix(git): honor core.sshCommand for Source Control fetch/pull/push` | SSH key fix (#2) | Yes |
+| `feat(source-control): VS Code-style stashes` | Stash menu, section and Stash & Switch | Yes |
 
 The tag `fork-base` marks the release commit those commits sit on. `main` is the only branch.
 Open pull requests against `main`.
@@ -59,7 +63,9 @@ If the rebase stops on a conflict:
   `git checkout --ours src/renderer/src/i18n/locales/en.json && pnpm run sync:localization-catalog`.
 - Anything under `src/`: upstream refactored code the fork touches. Keep upstream's shape and
   re-apply the fork change. The changes are small: grep for `branchSwitch`, `GitBranchCheckout`,
-  `git:checkout`, `BranchSync` and `gitNetworkOptionsForWorktree`.
+  `git:checkout`, `BranchSync`, `gitNetworkOptionsForWorktree`, `git.stash` and `GitStash`.
+- `src/shared/rpc-contract/rpc-params-catalog.generated.ts`: take upstream's file, then
+  `pnpm run generate:rpc-params-catalog`.
 - `resources/build/icon.*`: keep the fork's version.
 
 Then `git add … && git rebase --continue`.
@@ -76,8 +82,9 @@ pnpm test src/shared/git-branch-checkout.test.ts \
   src/renderer/src/components/status-bar \
   src/renderer/src/runtime src/renderer/src/web \
   src/relay/git-handler.test.ts src/main/runtime/rpc/methods/git.test.ts \
+  src/main/runtime/runtime-git-api-contract.test.ts src/shared/git-stash.test.ts \
   src/main/git
-pnpm run check:code-quality:changed
+ORCA_CODE_QUALITY_BASE="$NEW" pnpm run check:code-quality:changed  # origin/main predates the rebase
 ```
 
 `pnpm install` can rewrite `pnpm-lock.yaml` (it adds `@pnpm/exe`). Don't commit that:
