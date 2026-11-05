@@ -52,6 +52,16 @@ describe('unhandled provider frame journal fallback', () => {
     ).toBeNull()
     expect(unhandledProviderFrameJournalItem('claude', 'message:system:init', {})).toBeNull()
     expect(
+      unhandledProviderFrameJournalItem('claude', 'message:system:init', {
+        type: 'system',
+        subtype: 'init',
+        mcp_servers: [
+          { name: 'plugin:clay:clay', status: 'failed' },
+          { name: 'contexto', status: 'connected' }
+        ]
+      })
+    ).toBeNull()
+    expect(
       unhandledProviderFrameJournalItem('claude', 'message:result', {
         subtype: 'success',
         is_error: false

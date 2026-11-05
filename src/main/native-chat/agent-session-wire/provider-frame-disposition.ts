@@ -318,6 +318,16 @@ const PROVIDER_FRAME_CATALOGS: ReadonlyMap<
   ]
 ])
 
+/**
+ * Frames whose payload is a session inventory, never a report about this frame.
+ * Claude's `system:init` lists every MCP server with its `status`, so one that
+ * failed to connect (`status: "failed"`) would otherwise trip the payload sniff
+ * and print the whole 25 KB init frame as a red `claude · message:system:init`.
+ */
+const PAYLOAD_SNIFF_EXEMPT_KINDS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ['claude', new Set(['message:system:init'] satisfies ClaudeStreamJsonFrameKind[])]
+])
+
 export function classifyProviderFrame(
   provider: string,
   kind: string,
@@ -326,7 +336,7 @@ export function classifyProviderFrame(
   // Payload failure inspection outranks the name-shape heuristic below: an
   // unknown frame that reports an error must reach the user even when its
   // method name happens to look like a stream delta.
-  if (hasProviderError(payload)) {
+  if (PAYLOAD_SNIFF_EXEMPT_KINDS.get(provider)?.has(kind) !== true && hasProviderError(payload)) {
     return 'error-surface'
   }
   if (isDeltaProviderFrameKind(kind)) {

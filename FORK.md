@@ -23,6 +23,7 @@ Everything lives on `main`, as a few commits on top of an official release:
 | `feat(source-control): VS Code-style branch sync indicator` | Sync indicator (#1) | Yes |
 | `fix(git): honor core.sshCommand for Source Control fetch/pull/push` | SSH key fix (#2) | Yes |
 | `feat(source-control): VS Code-style stashes` | Stash menu, section and Stash & Switch | Yes |
+| `fix(native-chat): don't surface Claude's init frame as an error` | A failed MCP server in `system:init` no longer prints the whole frame as a red row | Yes |
 
 The tag `fork-base` marks the release commit those commits sit on. `main` is the only branch.
 Open pull requests against `main`.
