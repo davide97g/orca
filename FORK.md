@@ -145,7 +145,7 @@ const base = require('$PWD/config/electron-builder.config.cjs')
 module.exports = { ...base, extraMetadata: { ...(base.extraMetadata || {}), version: '$VERSION' } }
 EOF
 
-ORCA_MAC_RELEASE=1 APPLE_KEYCHAIN_PROFILE=orca-notary \
+ORCA_MAC_RELEASE=1 APPLE_KEYCHAIN_PROFILE=orca-notary ORCA_MAC_TEAM_ID=DA596D32QB \
 ORCA_BUILD_COMMIT=$(git rev-parse --short=12 HEAD) \
   pnpm exec electron-builder --config /tmp/eb-release.config.cjs --mac dir --arm64 --publish never
 xcrun stapler validate dist/mac-arm64/Orca.app
@@ -171,7 +171,7 @@ module.exports = {
 }
 EOF
 
-ORCA_MAC_RELEASE=1 pnpm exec electron-builder --config /tmp/eb-package.config.cjs \
+ORCA_MAC_RELEASE=1 ORCA_MAC_TEAM_ID=DA596D32QB pnpm exec electron-builder --config /tmp/eb-package.config.cjs \
   --mac --arm64 --prepackaged dist/mac-arm64/Orca.app --publish never
 DMG="dist/Orca-$VERSION-arm64.dmg"
 codesign --force --sign "Developer ID Application: Davide Ghiotto (DA596D32QB)" --timestamp "$DMG"
