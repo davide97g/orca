@@ -1,4 +1,4 @@
-import { SourceControlBranchPicker } from '../branches/SourceControlBranchPicker'
+import { SourceControlBranchSyncHeadControl } from './branch-sync-head-control'
 import { BulkActionBar } from '../commit/bulk-action-bar'
 import { SourceControlHeaderToolbar } from './header-toolbar'
 import { SourceControlNotesShelf } from '../notes/notes-shelf'
@@ -69,7 +69,7 @@ export function SourceControlPanelReady(props: SourceControlPanelReadyProps) {
         <SourceControlHeaderToolbar
           headControl={
             gitIdentityDisplay?.kind === 'branch' ? (
-              <SourceControlBranchPicker model={model} />
+              <SourceControlBranchSyncHeadControl model={model} />
             ) : undefined
           }
           filterQuery={filterQuery}

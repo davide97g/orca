@@ -24541,6 +24541,13 @@
       "switchedIn": "In {{workspace}}",
       "thisComputer": "this computer",
       "updateHost": "Update Orca on {{host}} to switch branches from here."
+    },
+    "branchSync": {
+      "forcePushTooltip": "Remote only has older copies of local commits. Click to force push with lease.",
+      "upstreamFallback": "upstream",
+      "upToDate": "Up to date with {{upstream}}. Click to sync.",
+      "syncTooltip": "Sync with {{upstream}}: {{behind}} to pull, {{ahead}} to push",
+      "publishTooltip": "Publish branch"
     }
   },
   "agentsSidebarIntro": {

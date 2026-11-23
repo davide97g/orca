@@ -22,6 +22,7 @@ import { scrollStripSidewaysOnWheel } from '../tab-bar/strip/tab-strip-scroll-me
 import { StatusBarVisibilityMenu } from './composition/StatusBarVisibilityMenu'
 import { isPairedWebClientWindow } from '@/app-shell/chrome/desktop-window-chrome'
 import { GitBlameStatusSegment } from './GitBlameStatusSegment'
+import { BranchSyncStatusSegment } from './BranchSyncStatusSegment'
 
 const PetStatusSegment = lazyWithRetry(() =>
   import('./PetStatusSegment').then((module) => ({ default: module.PetStatusSegment }))
@@ -98,6 +99,7 @@ export function StatusBarSurface({
         setMenuOpen(true)
       }}
     >
+      <BranchSyncStatusSegment />
       <StatusBarUsageArea controller={controller} />
 
       {/* Why: attention segments shrink only after usage reaches its minimum, then scroll instead of
