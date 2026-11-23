@@ -104,6 +104,7 @@ Build the app code and native helpers:
 pnpm run build:desktop
 pnpm run build:computer-macos
 pnpm run build:keyboard-layout-macos
+pnpm run build:process-footprint-macos
 pnpm run build:notification-status-macos
 pnpm run ensure:electron-runtime
 ```
