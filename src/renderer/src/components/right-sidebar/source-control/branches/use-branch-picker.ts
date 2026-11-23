@@ -8,6 +8,7 @@ import {
   switchRuntimeGitBranch,
   branchSwitchExistingBranch
 } from '@/runtime/source-control/git/runtime-git-branch-client'
+import { runRuntimeGitStashMutation } from '@/runtime/source-control/git/runtime-git-stash-client'
 import type {
   RuntimeGitLocalBranches,
   RuntimeRepoSearchRefs
@@ -144,7 +145,7 @@ export function useBranchPicker(options: BranchPickerOptions) {
   const { onOpenWorkspace, onSwitched, hostLabel, workspaceLabel } = options
   const selectRef = useRef<(row: BranchPickerRow) => Promise<void>>(async () => {})
   const select = useCallback(
-    async (row: BranchPickerRow) => {
+    async (row: BranchPickerRow, selectOptions?: { stashFirst?: boolean }) => {
       if (row.workspace) {
         onOpenWorkspace(row.workspace)
         setOpen(false)
@@ -157,6 +158,14 @@ export function useBranchPicker(options: BranchPickerOptions) {
       const ownGeneration = generation.current
       setPending(true)
       try {
+        // Stash & Switch: a new branch carries the changes, so only an existing branch stashes first.
+        if (selectOptions?.stashFirst && row.target.kind !== 'new') {
+          await runRuntimeGitStashMutation(route, {
+            kind: 'push',
+            mode: 'include-untracked',
+            message: `Stash & Switch to ${row.target.name}`
+          })
+        }
         const result = await switchRuntimeGitBranch(route, row.target, hostLabel)
         onSwitched(result.warning)
         if (generation.current === ownGeneration) {

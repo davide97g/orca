@@ -14,6 +14,8 @@ type RuntimeGitCommandName =
   | 'switchRuntimeGitBranch'
   | 'checkoutRuntimeGitBranch'
   | 'listRuntimeGitLocalBranches'
+  | 'listRuntimeGitStashes'
+  | 'runRuntimeGitStashMutation'
   | 'getRuntimeGitDiff'
   | 'getRuntimeGitBranchCompare'
   | 'getRuntimeGitCommitCompare'
@@ -70,6 +72,8 @@ export function installRuntimeGitCommandSurface(
     switchRuntimeGitBranch: commands.switchRuntimeGitBranch.bind(commands),
     checkoutRuntimeGitBranch: commands.checkoutRuntimeGitBranch.bind(commands),
     listRuntimeGitLocalBranches: commands.listRuntimeGitLocalBranches.bind(commands),
+    listRuntimeGitStashes: commands.listRuntimeGitStashes.bind(commands),
+    runRuntimeGitStashMutation: commands.runRuntimeGitStashMutation.bind(commands),
     getRuntimeGitDiff: commands.getRuntimeGitDiff.bind(commands),
     getRuntimeGitBranchCompare: commands.getRuntimeGitBranchCompare.bind(commands),
     getRuntimeGitCommitCompare: commands.getRuntimeGitCommitCompare.bind(commands),

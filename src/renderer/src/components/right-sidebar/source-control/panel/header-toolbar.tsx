@@ -19,6 +19,7 @@ import {
 import { SourceControlBranchContextRow } from './branch-context-row'
 import { shouldShowSourceControlBranchContextChrome } from './branch-context-stats'
 import { SourceControlHeaderOverflowMenu } from './header-overflow-menu'
+import type { SourceControlStashes } from '../stash/use-stashes'
 import { useSourceControlHeaderActionsSlot } from './header-actions-slot'
 import { useSourceControlScope } from './worktree-scope'
 
@@ -49,6 +50,7 @@ type SourceControlHeaderToolbarProps = {
   headDisplay?: WorktreeGitIdentityDisplay | null
   manualReviewUrl?: string | null
   branchLineTotal?: GitBranchLineTotal | null
+  stashes?: SourceControlStashes | null
 }
 
 function renderOverflowMenu(
@@ -62,6 +64,7 @@ function renderOverflowMenu(
     | 'branchCompareRefreshDisabled'
     | 'diffCommentCount'
     | 'onExpandNotes'
+    | 'stashes'
   >
 ): React.JSX.Element {
   return <SourceControlHeaderOverflowMenu panelActions={props} />
@@ -93,7 +96,8 @@ export function SourceControlHeaderToolbar({
   headDisplay = null,
   headControl,
   manualReviewUrl,
-  branchLineTotal
+  branchLineTotal,
+  stashes = null
 }: SourceControlHeaderToolbarProps): React.JSX.Element {
   const t = useTranslate()
   const embedded = useSourceControlScope() !== null
@@ -109,7 +113,8 @@ export function SourceControlHeaderToolbar({
     onRefreshBranchCompare,
     branchCompareRefreshDisabled,
     diffCommentCount,
-    onExpandNotes
+    onExpandNotes,
+    stashes
   }
 
   const expandFilter = useCallback(() => {

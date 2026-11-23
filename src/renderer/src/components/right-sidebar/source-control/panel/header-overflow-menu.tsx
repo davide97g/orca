@@ -23,6 +23,8 @@ import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store'
 import { unnestWorktrees } from '../../../sidebar/workspace-actions/parenting/worktree-unnest'
 import { useSourceControlScopeOwner } from './worktree-scope'
+import { SourceControlStashMenu } from '../stash/stash-menu'
+import type { SourceControlStashes } from '../stash/use-stashes'
 
 type PanelActions = {
   sourceControlViewMode: SourceControlViewMode
@@ -33,6 +35,7 @@ type PanelActions = {
   branchCompareRefreshDisabled: boolean
   diffCommentCount: number
   onExpandNotes: () => void
+  stashes?: SourceControlStashes | null
 }
 
 export function SourceControlHeaderOverflowMenu({
@@ -104,6 +107,12 @@ export function SourceControlHeaderOverflowMenu({
                 'Refresh branch compare'
               )}
             </DropdownMenuItem>
+            {panelActions.stashes ? (
+              <>
+                <DropdownMenuSeparator />
+                <SourceControlStashMenu stashes={panelActions.stashes} />
+              </>
+            ) : null}
             {panelActions.diffCommentCount > 0 ? (
               <>
                 <DropdownMenuSeparator />

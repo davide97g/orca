@@ -1,5 +1,9 @@
 import { defineMethod } from '../../../core'
-import { GitSwitchBranch } from '../../../../../../shared/rpc-contract/source-control/git-params'
+import {
+  GitStash,
+  GitSwitchBranch,
+  WorktreeSelector
+} from '../../../../../../shared/rpc-contract/source-control/git-params'
 
 export const GIT_BRANCH_METHODS = [
   defineMethod({
@@ -8,5 +12,18 @@ export const GIT_BRANCH_METHODS = [
     params: GitSwitchBranch,
     handler: async (params, { runtime }) =>
       runtime.switchRuntimeGitBranch(params.worktree, params.target)
+  }),
+  defineMethod({
+    name: 'git.stashList',
+    permission: 'workspace',
+    params: WorktreeSelector,
+    handler: async (params, { runtime }) => runtime.listRuntimeGitStashes(params.worktree)
+  }),
+  defineMethod({
+    name: 'git.stash',
+    permission: 'workspace',
+    params: GitStash,
+    handler: async (params, { runtime }) =>
+      runtime.runRuntimeGitStashMutation(params.worktree, params.mutation)
   })
 ]

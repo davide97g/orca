@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from 'react'
+import { memo, useCallback, type ReactNode } from 'react'
 import { Check, ChevronDown, Copy, GitBranch, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -29,7 +29,13 @@ export function BranchPicker({
   const t = useTranslate()
   useUiLanguageRevision()
   const picker = useBranchPicker(options)
-  const disabled = blocker !== null || picker.pending
+  // Stash & Switch: a dirty-only blocker keeps rows selectable and stashes before switching.
+  const disabled = (blocker !== null && !dirtyOnlyBlocker) || picker.pending
+  const { select } = picker
+  const selectRow = useCallback(
+    (row: BranchPickerRow) => select(row, { stashFirst: dirtyOnlyBlocker }),
+    [select, dirtyOnlyBlocker]
+  )
   return (
     <Popover open={picker.open} onOpenChange={picker.setOpen}>
       <PopoverTrigger asChild>
@@ -54,7 +60,15 @@ export function BranchPicker({
             value={picker.query}
             onValueChange={picker.setQuery}
           />
-          {[blocker, picker.error ?? picker.discoveryError].map(
+          {[
+            dirtyOnlyBlocker
+              ? t(
+                  'sourceControl.branchPicker.stashAndSwitch',
+                  'You have uncommitted changes. Picking a branch stashes them (including untracked files) and switches. A new branch keeps them.'
+                )
+              : blocker,
+            picker.error ?? picker.discoveryError
+          ].map(
             (reason) =>
               reason && (
                 <p
@@ -75,8 +89,8 @@ export function BranchPicker({
                 branch={branch}
                 openedAt={picker.openedAt}
                 pending={picker.pending}
-                disabled={row.target.kind === 'new' && dirtyOnlyBlocker ? picker.pending : disabled}
-                onSelect={picker.select}
+                disabled={disabled}
+                onSelect={selectRow}
                 onCopy={row.current ? onCopyBranch : undefined}
               />
             ))}

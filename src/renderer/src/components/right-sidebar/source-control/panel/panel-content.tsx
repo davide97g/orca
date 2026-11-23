@@ -11,9 +11,13 @@ import { SourceControlForkPushNotice } from './fork-push-notice'
 import type { SourceControlPanelReadyProps } from './panel-props'
 import { useSourceControlScope } from './worktree-scope'
 import { openGitGraph } from '@/lib/source-control/graph/git-graph-tab'
+import { SourceControlStashSection } from '../stash/stash-section'
+import type { SourceControlStashes } from '../stash/use-stashes'
 
-export function SourceControlPanelContent(props: SourceControlPanelReadyProps) {
-  const { activeWorktree, currentWorktreeId, model, worktreePath } = props
+export function SourceControlPanelContent(
+  props: SourceControlPanelReadyProps & { stashes: SourceControlStashes | null }
+) {
+  const { activeWorktree, currentWorktreeId, model, stashes, worktreePath } = props
   // Folder sections sit in cards, so the dock matches the card instead of the sidebar.
   const dockBackground = useSourceControlScope() ? 'bg-card/95' : 'bg-sidebar/95'
   const {
@@ -196,6 +200,14 @@ export function SourceControlPanelContent(props: SourceControlPanelReadyProps) {
           diffCommentCountByPath={diffCommentCountByPath}
         />
       )}
+
+      {stashes ? (
+        <SourceControlStashSection
+          stashes={stashes}
+          collapsedSections={collapsedSections}
+          toggleSection={toggleSection}
+        />
+      ) : null}
 
       {shouldShowSourceControlCompareUnavailableCard(
         branchSummary,

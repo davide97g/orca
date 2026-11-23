@@ -13,7 +13,11 @@ import {
   searchRuntimeRemoteBranches,
   switchRuntimeGitBranch
 } from '@/runtime/source-control/git/runtime-git-branch-client'
+import { runRuntimeGitStashMutation } from '@/runtime/source-control/git/runtime-git-stash-client'
 
+vi.mock('@/runtime/source-control/git/runtime-git-stash-client', () => ({
+  runRuntimeGitStashMutation: vi.fn()
+}))
 vi.mock('@/runtime/source-control/git/runtime-git-branch-client', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchClient>()),
   listRuntimeGitBranches: vi.fn(),
@@ -90,7 +94,8 @@ it('keeps disk blockers authoritative and offers the existing branch after a col
     onOpenWorkspace: vi.fn(),
     onSwitched: vi.fn()
   }
-  await act(async () => root.render(<BranchPicker {...props} />))
+  // A dirty-only blocker offers Stash & Switch; any other blocker keeps existing branches disabled.
+  await act(async () => root.render(<BranchPicker {...props} dirtyOnlyBlocker={false} />))
   await act(async () => container.querySelector('button')?.click())
   const feature = Array.from(container.querySelectorAll('button')).find(
     (button) => button.textContent === 'feature'
@@ -151,7 +156,7 @@ it('keeps disk blockers authoritative and offers the existing branch after a col
     (button) => button.textContent === 'Create branch draft from main'
   )
   expect(create?.disabled).toBe(false)
-  expect(container.textContent).toContain('Commit or discard 2 changed files')
+  expect(container.textContent).toContain('Picking a branch stashes them')
   await act(async () =>
     root.render(<BranchPicker {...props} dirtyOnlyBlocker={false} blocker="Finish the merge." />)
   )
@@ -200,4 +205,49 @@ it('delivers the original workspace outcome after the picker unmounts', async ()
   await act(async () => root.render(<p>Another workspace</p>))
   await act(async () => finish?.({ ok: true, branch: 'feature', warning: 'Files left behind.' }))
   expect(onSwitched).toHaveBeenCalledWith('Files left behind.')
+})
+
+it('stashes uncommitted changes before switching when only local changes block', async () => {
+  vi.mocked(listRuntimeGitBranches).mockResolvedValue({
+    current: 'main',
+    branches: ['main', 'feature']
+  })
+  vi.mocked(searchRuntimeRemoteBranches).mockResolvedValue({ refs: [], truncated: false })
+  vi.mocked(runRuntimeGitStashMutation).mockResolvedValue({ ok: true, changed: true })
+  vi.mocked(switchRuntimeGitBranch).mockResolvedValue({ ok: true, branch: 'feature' })
+  const props: BranchPickerProps = {
+    branch: 'main',
+    blocker: 'Commit or discard 2 changed files before switching.',
+    dirtyOnlyBlocker: true,
+    context: { target: { kind: 'local' }, worktreeId: 'repo::/repo', worktreePath: '/repo' },
+    repoId: 'repo',
+    hostId: 'local',
+    hostLabel: 'This computer',
+    workspaceLabel: 'repo',
+    workspaces: new Map(),
+    onOpenWorkspace: vi.fn(),
+    onSwitched: vi.fn()
+  }
+  await act(async () => root.render(<BranchPicker {...props} />))
+  await act(async () => container.querySelector('button')?.click())
+  expect(container.textContent).toContain('Picking a branch stashes them')
+  const feature = Array.from(container.querySelectorAll('button')).find(
+    (button) => button.textContent === 'feature'
+  )
+  expect(feature?.disabled).toBe(false)
+  await act(async () => feature?.click())
+  expect(runRuntimeGitStashMutation).toHaveBeenCalledWith(props.context, {
+    kind: 'push',
+    mode: 'include-untracked',
+    message: 'Stash & Switch to feature'
+  })
+  expect(switchRuntimeGitBranch).toHaveBeenCalledWith(
+    props.context,
+    { kind: 'local', name: 'feature' },
+    'This computer'
+  )
+  expect(vi.mocked(runRuntimeGitStashMutation).mock.invocationCallOrder[0]).toBeLessThan(
+    vi.mocked(switchRuntimeGitBranch).mock.invocationCallOrder[0] ?? 0
+  )
+  expect(props.onSwitched).toHaveBeenCalledOnce()
 })
